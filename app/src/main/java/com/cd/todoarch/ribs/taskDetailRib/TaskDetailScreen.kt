@@ -1,4 +1,4 @@
-package com.cd.todoarch
+package com.cd.todoarch.ribs.taskDetailRib
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,13 +22,13 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskDetailScreen(title: String, description: String, navController: NavController) {
+fun TaskDetailScreen(state:TaskDetailState, onClose: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(title) },
+                title = { Text(state.task?.title ?: "") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick =  onClose ) {
                         Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -48,9 +48,9 @@ fun TaskDetailScreen(title: String, description: String, navController: NavContr
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues).padding(16.dp)) {
-            Text(text = title, style = MaterialTheme.typography.headlineMedium)
+            Text(text = state.task?.title.orEmpty(), style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = description, style = MaterialTheme.typography.bodyLarge)
+            Text(text = state.task?.description.orEmpty(), style = MaterialTheme.typography.bodyLarge)
         }
     }
 }

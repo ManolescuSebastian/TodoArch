@@ -1,3 +1,10 @@
 package com.cd.todoarch.data
 
-data class Task(val id: Int, val title: String, val description: String)
+import java.util.UUID
+
+data class Task(
+    val id: String = UUID.randomUUID().toString(),
+    val title: String,
+    val description: String,
+    val isCompleted: Boolean = false
+)
