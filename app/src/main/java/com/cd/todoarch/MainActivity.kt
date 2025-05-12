@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +46,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cd.todoarch.data.Task
+import com.cd.todoarch.core.todoapp.model.Task
 import com.cd.todoarch.ui.theme.TodoArchTheme
 import com.cd.todoarch.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
@@ -60,10 +61,11 @@ class MainActivity : ComponentActivity() {
                     val navController = rememberNavController()
                     NavHost(navController, startDestination = "todoList") {
                         composable("todoList") { TodoApp(navController, innerPadding) }
-                        composable("taskDetail/{title}/{description}") { backStackEntry ->
-                            val title = backStackEntry.arguments?.getString("title") ?: ""
-                            val description = backStackEntry.arguments?.getString("description") ?: ""
-                            TaskDetailScreen(title, description, navController)
+                        composable("taskDetail/{taskId}") { backStackEntry ->
+                            TaskDetailScreen(
+                                taskId = backStackEntry.arguments?.getString("taskId")?.toInt() ?: -1,
+                                navController = navController
+                            )
                         }
                     }
                 }
@@ -79,6 +81,7 @@ fun TodoApp(navController: NavController, innerPadding: PaddingValues) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
+    val tasks = viewModel.tasks.collectAsState(emptyList())
 
     Scaffold(
         modifier = Modifier.padding(innerPadding),
@@ -91,17 +94,27 @@ fun TodoApp(navController: NavController, innerPadding: PaddingValues) {
             }
         }
     ) { paddingValues ->
-        TaskList(tasks = viewModel.tasks, navController, viewModel, modifier = Modifier.padding(paddingValues))
+        TaskList(
+            tasks = tasks.value,
+            navController = navController,
+            viewModel = viewModel,
+            modifier = Modifier.padding(paddingValues)
+        )
 
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
                 sheetState = sheetState
             ) {
-                AddTaskBottomSheet(
+                EditTaskBottomSheet(
+                    initialTitle = "",
+                    initialDescription = "",
                     onSave = { title, description ->
                         viewModel.addTask(title, description)
                         coroutineScope.launch { sheetState.hide() }
+                        showBottomSheet = false
+                    },
+                    onCancel = {
                         showBottomSheet = false
                     }
                 )
@@ -128,9 +141,9 @@ fun TaskItem(task: Task, navController: NavController, viewModel: TaskViewModel)
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .clickable { navController.navigate("taskDetail/${task.title}/${task.description}") }
+            .clickable { navController.navigate("taskDetail/${task.id}") }
             .combinedClickable(
-                onClick = { navController.navigate("taskDetail/${task.title}/${task.description}") },
+                onClick = { navController.navigate("taskDetail/${task.id}") },
                 onLongClick = { showOptions = true }
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -147,7 +160,14 @@ fun TaskItem(task: Task, navController: NavController, viewModel: TaskViewModel)
             Column(modifier = Modifier.padding(32.dp).fillMaxWidth()) {
                 Text("Options", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(modifier = Modifier.fillMaxWidth(), onClick = { viewModel.removeTask(task); showOptions = false }) {
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    onClick = {
+                        viewModel.removeTask(task)
+                        showOptions = false
+                    }
+                ) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete Task")
