@@ -15,15 +15,16 @@ class TaskDetailRouter(
     }
 
     fun willDetach() {
-        //Cleanup if needed
+        println("TaskDetailRouter: willDetach")
+        interactor.willResignActive()
     }
 
     @Composable
     fun View() {
         val state by interactor.state.collectAsState()
         TaskDetailScreen(state) {
-//            interactor.handleBackNavigation
-            onClose
+            interactor.handleBackNavigation()
+            onClose.invoke()
         }
     }
 

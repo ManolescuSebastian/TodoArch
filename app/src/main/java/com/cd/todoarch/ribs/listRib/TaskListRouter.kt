@@ -13,17 +13,28 @@ class TaskListRouter(
     private val taskDetailBuilder: TaskDetailBuilder,
 ) {
 
-
     // --- State for Active Child ---
     // Track which child router is currently active.
     // `null` signifies that the TodoListScreen itself should be shown.
     // Using `mutableStateOf` for direct integration with Compose's recomposition.
     private var currentChild by mutableStateOf<Any?>(null)
 
+    // Rib lifecycle simulation
+    fun didAttach() {
+        interactor.router = this
+        interactor.didBecomeActive()
+    }
+
+    fun willDetach() {
+        interactor.willResignActive()
+        detachCurrentChild()
+    }
+
     fun routeToDetailView(taskId: String) {
         // Before attaching a new child, ensure any existing child is detached.
         // This example supports only one child active at a time.
         detachCurrentChild()
+        println("TaskListRouter: Routing to Task Detail for task $taskId")
         val detailRouter = taskDetailBuilder.build(
             TaskDetailBuilder.BuildParams(
                 itemId = taskId,
@@ -39,20 +50,18 @@ class TaskListRouter(
         detachCurrentChild()
     }
 
-    fun didAttach() {
-        interactor.router = this
-        interactor.didBecomeActive()
-    }
 
-    fun willDetach() {
-        detachCurrentChild()
-    }
 
     private fun detachCurrentChild() {
         val childToDetach = currentChild
-
+        if (childToDetach != null) {
+            println("TaskListRouter: Detaching child router.")
+            if (childToDetach is TaskDetailRouter) { // Check for TaskDetailRouter
+                childToDetach.willDetach()
+            }
+            currentChild = null
+        }
     }
-
 
     @Composable
     fun View() {
@@ -76,5 +85,16 @@ class TaskListRouter(
             println("TodoListRouter Composable: Rendering Detail Child (TodoDetailRouter's View).")
             activeChild.View()
         }
+    }
+
+    // --- Back Press Handling (Simplified) ---
+    fun handleBackPress(): Boolean {
+        if (currentChild != null) {
+            println("TaskListRouter: Handling back press by detaching child.")
+            detachCurrentChild() // Pop the detail screen if it's open
+            return true
+        }
+        println("TaskListRouter: No child to handle back press.")
+        return false
     }
 }

@@ -1,7 +1,6 @@
 package com.cd.todoarch.ribs.taskDetailRib
 
 import com.cd.todoarch.data.TaskRepository
-import com.cd.todoarch.ribs.listRib.TaskListInteractor
 
 class TaskDetailBuilder(
     private val dependency: TaskDetailDependency
@@ -14,19 +13,20 @@ class TaskDetailBuilder(
 
     data class BuildParams(
         val itemId: String,
-        val listener: () -> Unit // The onClose listener for back
+        val onClose: () -> Unit
     )
 
     fun build(buildParams: BuildParams): TaskDetailRouter {
         val interactor = TaskDetailInteractor(
-            itemId = buildParams.itemId,
+            taskId = buildParams.itemId,
             repository = dependency.taskRepository(),
         )
         val router = TaskDetailRouter(
             interactor = interactor,
-            onClose = buildParams.listener
+            onClose = buildParams.onClose
         )
 
+        println("TaskDetailBuilder: TaskDetailRIB built.")
         return router
     }
 }
