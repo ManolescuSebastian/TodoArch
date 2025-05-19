@@ -67,7 +67,6 @@ fun TaskListScreen(taskListState: TaskListState, onItemClicked: (String) -> Unit
             ) {
                 AddTaskBottomSheet(
                     onSave = { title, description ->
-//                        viewModel.addTask(title, description)
                         coroutineScope.launch { sheetState.hide() }
                         showBottomSheet = false
                     }

@@ -38,7 +38,7 @@ class TaskListRouter(
         val detailRouter = taskDetailBuilder.build(
             TaskDetailBuilder.BuildParams(
                 itemId = taskId,
-                listener = ::detachDetail
+                onClose = ::detachDetail
             )
         )
         detailRouter.didAttach()
@@ -49,8 +49,6 @@ class TaskListRouter(
         println("TaskListRouter: detaching detail child")
         detachCurrentChild()
     }
-
-
 
     private fun detachCurrentChild() {
         val childToDetach = currentChild

@@ -46,7 +46,7 @@ class TaskListInteractor(private val repository: TaskRepository): BasicInteracto
 
     //Region business logic
 
-    fun addTask(title: String, description: String? = null) {
+    fun addTask(title: String, description: String) {
         interactorScope.launch {
             try {
                 println("TaskListInteractor: Adding task '$title' via repository")

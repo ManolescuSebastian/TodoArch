@@ -25,20 +25,16 @@ class RootBuilder(
 }
 
 class RootRouter(private val taskListBuilder: TaskListBuilder) {
-    private var taskListRouter: TaskListRouter? by mutableStateOf(null)
     private var isAttached: Boolean = false
+
+    private var activeChild: Any? by mutableStateOf(null)
 
     //Called by MainActivity
     fun dispatchAttach() {
         if (!isAttached) {
             println("RootRouter: dispatchAttach called.")
             isAttached = true
-            // Attach the main content RIB (TodoListRIB in this case)
-            if (taskListRouter == null) {
-                taskListRouter = taskListBuilder.build()
-            }
-            taskListRouter?.didAttach() // Tell child it's attached
-            println("RootRouter: TodoListRouter attached.")
+            attachTaskList()
         }
     }
 
@@ -46,24 +42,57 @@ class RootRouter(private val taskListBuilder: TaskListBuilder) {
     fun dispatchDetach() {
         if (isAttached) {
             println("RootRouter: dispatchDetach called.")
-            taskListRouter?.willDetach() // Tell child it will detach
+            detachCurrentChild()
             // todoListRouter = null // Optional: clear child if it shouldn't be reused
             isAttached = false
             println("RootRouter: TodoListRouter detached.")
         }
     }
 
+    private fun detachCurrentChild() {
+        val childToDetach = activeChild
+        if (childToDetach != null) {
+            println("RootRouter: Detaching current child")
+            if (childToDetach is TaskListRouter) {
+                childToDetach.willDetach()
+            }
+            activeChild = null
+        }
+    }
+
+    private fun attachTaskList() {
+        detachCurrentChild()
+        val taskListRouter = taskListBuilder.build()
+        activeChild = taskListRouter
+        taskListRouter.didAttach()
+    }
+
     @Composable
     fun View() {
-        // RootRouter delegates its UI to its active child.
-        // In a more complex app, RootRouter might decide between different
-        // top-level children (e.g., LoggedIn vs LoggedOut).
-        taskListRouter?.let {
-            println("RootRouter Composable: Rendering TodoListRouter.View")
-            it.View() // Call the child's Composable View
-        } ?: run {
-            println("RootRouter Composable: No active child to render.")
-            // Optionally show a loading screen or an error if no child is ready
+        val child = activeChild
+        if(child is TaskListRouter) {
+            child.View()
+        } else {
+            println("RootRouter Composable: No active/recognized child router to render.")
+        }
+    }
+
+    /** Handles back press events. */
+    fun handleBackPress(): Boolean {
+        val childRouter = activeChild
+        val handled = if (childRouter is TaskListRouter) { // Check for TaskListRouter
+            println("RootRouter: Delegating back press to TaskListRouter")
+            childRouter.handleBackPress() // Delegate to TaskListRouter
+        } else {
+            false
+        }
+
+        if (handled) {
+            println("RootRouter: Back press handled by child.")
+            return true
+        } else {
+            println("RootRouter: Back press not handled by children (or no children).")
+            return false
         }
     }
 }
