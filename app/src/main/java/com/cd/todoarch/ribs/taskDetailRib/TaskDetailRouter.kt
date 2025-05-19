@@ -6,7 +6,7 @@ import androidx.compose.runtime.getValue
 
 class TaskDetailRouter(
     private val interactor: TaskDetailInteractor,
-    private val onClose: () -> Unit
+    private val onClose: () -> Unit,
 ) {
     // --- RIB Lifecycle --- (Conceptual)
     fun didAttach() {
@@ -22,10 +22,16 @@ class TaskDetailRouter(
     @Composable
     fun View() {
         val state by interactor.state.collectAsState()
-        TaskDetailScreen(state) {
-            interactor.handleBackNavigation()
-            onClose.invoke()
-        }
+        TaskDetailScreen(
+            state = state,
+            onClose = {
+                interactor.handleBackNavigation(onClose)
+            },
+            onEdit = interactor::handleEdit,
+            onDelete = {
+                interactor.handleDelete(onClose)
+            },
+        )
     }
 
 }

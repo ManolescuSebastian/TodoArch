@@ -98,7 +98,7 @@ fun TaskList(
             TaskItem(
                 task,
                 onItemClicked = { onItemClicked(task.id) },
-                onTaskDeleted
+                onTaskDeleted,
             )
         }
     }
@@ -144,6 +144,7 @@ fun TaskItem(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         onTaskDeleted(task.id)
+                        showOptions = false
                     }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     Spacer(modifier = Modifier.width(8.dp))

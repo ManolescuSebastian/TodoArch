@@ -5,6 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -18,6 +20,8 @@ interface TaskRepository {
 
     /** Gets a single task by its ID. */
     suspend fun getTask(id: String): Task?
+
+    suspend fun getTaskStream(id: String): Flow<Task?>
 
     /** Adds a new task. */
     suspend fun addTask(task: Task)
@@ -66,6 +70,12 @@ class InMemoryTaskRepository : TaskRepository {
                 tasks.find { it.id == id }
             }
         }
+    }
+
+    override suspend fun getTaskStream(id: String): Flow<Task?> {
+        return tasksFlow
+            .map { taskList -> taskList.find { it.id == id } }
+            .distinctUntilChanged()
     }
 
     override suspend fun addTask(task: Task) {

@@ -19,12 +19,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AddTaskBottomSheet(onSave: (String, String) -> Unit) {
-    var title by remember { mutableStateOf(TextFieldValue()) }
-    var description by remember { mutableStateOf(TextFieldValue()) }
+fun AddTaskBottomSheet(
+    onSave: (String, String) -> Unit,
+    dialogTitle: String = "Add New Task",
+    titleText: String = "",
+    descriptionText: String = "",
+) {
+    var title by remember { mutableStateOf(TextFieldValue(titleText)) }
+    var description by remember { mutableStateOf(TextFieldValue(descriptionText)) }
 
     Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-        Text("Add New Task", style = MaterialTheme.typography.titleMedium)
+        Text(dialogTitle, style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
