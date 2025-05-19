@@ -74,7 +74,9 @@ class TaskListRouter(
                 listScreenState,
                 onItemClicked = { taskId: String ->
                     routeToDetailView(taskId)
-                }
+                },
+                onTaskDeleted = interactor::deleteTask,
+                onTaskAdded = interactor::addTask
             )
         } else if (activeChild is TaskDetailRouter) {
             // --- TodoDetailRouter is active: Show the Detail Screen ---

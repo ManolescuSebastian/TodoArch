@@ -42,7 +42,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListScreen(taskListState: TaskListState, onItemClicked: (String) -> Unit) {
+fun TaskListScreen(
+    taskListState: TaskListState,
+    onItemClicked: (String) -> Unit,
+    onTaskDeleted: (String) -> Unit,
+    onTaskAdded: (String, String) -> Unit,
+) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -58,7 +63,12 @@ fun TaskListScreen(taskListState: TaskListState, onItemClicked: (String) -> Unit
             }
         }
     ) { paddingValues ->
-        TaskList(tasks = taskListState.tasks, modifier = Modifier.padding(paddingValues), onItemClicked)
+        TaskList(
+            tasks = taskListState.tasks,
+            modifier = Modifier.padding(paddingValues),
+            onItemClicked,
+            onTaskDeleted
+        )
 
         if (showBottomSheet) {
             ModalBottomSheet(
@@ -69,6 +79,7 @@ fun TaskListScreen(taskListState: TaskListState, onItemClicked: (String) -> Unit
                     onSave = { title, description ->
                         coroutineScope.launch { sheetState.hide() }
                         showBottomSheet = false
+                        onTaskAdded(title, description)
                     }
                 )
             }
@@ -77,17 +88,29 @@ fun TaskListScreen(taskListState: TaskListState, onItemClicked: (String) -> Unit
 }
 
 @Composable
-fun TaskList(tasks: List<Task>, modifier: Modifier = Modifier, onItemClicked: (String) -> Unit) {
+fun TaskList(
+    tasks: List<Task>, modifier: Modifier = Modifier,
+    onItemClicked: (String) -> Unit,
+    onTaskDeleted: (String) -> Unit,
+) {
     LazyColumn(modifier = modifier.padding(16.dp)) {
         items(tasks) { task ->
-            TaskItem(task, onItemClicked = { onItemClicked(task.id) })
+            TaskItem(
+                task,
+                onItemClicked = { onItemClicked(task.id) },
+                onTaskDeleted
+            )
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun TaskItem(task: Task, onItemClicked: () -> Unit) {
+fun TaskItem(
+    task: Task,
+    onItemClicked: () -> Unit,
+    onTaskDeleted: (String) -> Unit,
+) {
     var showOptions by remember { mutableStateOf(false) }
 
     Card(
@@ -96,7 +119,7 @@ fun TaskItem(task: Task, onItemClicked: () -> Unit) {
             .padding(vertical = 4.dp)
             .clickable { onItemClicked() }
             .combinedClickable(
-                onClick = onItemClicked ,
+                onClick = onItemClicked,
                 onLongClick = { showOptions = true }
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -110,10 +133,18 @@ fun TaskItem(task: Task, onItemClicked: () -> Unit) {
 
     if (showOptions) {
         ModalBottomSheet(onDismissRequest = { showOptions = false }) {
-            Column(modifier = Modifier.padding(32.dp).fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .padding(32.dp)
+                    .fillMaxWidth()
+            ) {
                 Text("Options", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(modifier = Modifier.fillMaxWidth(), onClick = { /*viewModel.removeTask(task); showOptions = false*/ }) {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        onTaskDeleted(task.id)
+                    }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete Task")
