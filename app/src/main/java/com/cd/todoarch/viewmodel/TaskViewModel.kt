@@ -37,7 +37,18 @@ class TaskViewModel : ViewModel() {
         }
     }
 
-    fun updateTodo(updatedTask: Task) {
+    private fun addTodo(text: String, description: String?) {
+        val taskId = if (todos.size <= 0) {
+            0
+        } else {
+            todos.size + 1
+        }
+        val todo = Task(taskId, text, description)
+        todos.add(todo)
+        _state.value = TodoState.TodoList(todos.toList())
+    }
+
+    private fun updateTodo(updatedTask: Task) {
         val currentState = _state.value
         if (currentState is TodoState.TodoList) {
             val updatedList = currentState.todoList.map { task ->
@@ -47,17 +58,6 @@ class TaskViewModel : ViewModel() {
             todos.addAll(updatedList)
             _state.value = TodoState.TodoList(updatedList)
         }
-    }
-
-    private fun addTodo(text: String, description: String?) {
-        val taskId = if (todos.size <= 0) {
-            todos.size
-        } else {
-            todos.size + 1
-        }
-        val todo = Task(taskId, text, description)
-        todos.add(todo)
-        _state.value = TodoState.TodoList(todos.toList())
     }
 
     private fun deleteTodo(id: Int) {
