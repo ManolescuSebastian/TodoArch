@@ -13,5 +13,6 @@ class RemoveTask(
             removeTask(task)
         }
         event(TaskRemoved(task))
+        subCommand(SaveTaskList)
     }
 }

@@ -18,5 +18,6 @@ class AddTask(
                 )
             ))
         }
+        subCommand(SaveTaskList)
     }
 }

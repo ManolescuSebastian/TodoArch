@@ -21,5 +21,6 @@ class UpdateTask(
             )
         }
         event(TaskUpdated(taskId))
+        subCommand(SaveTaskList)
     }
 }

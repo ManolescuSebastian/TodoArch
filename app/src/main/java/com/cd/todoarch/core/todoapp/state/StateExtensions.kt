@@ -2,6 +2,8 @@ package com.cd.todoarch.core.todoapp.state
 
 import com.cd.todoarch.core.todoapp.model.Task
 
+fun TodoState.setLoading() = copy(loadingTasks = true)
+fun TodoState.setComplete() = copy(loadingTasks = false)
 fun TodoState.addTasks(tasks: List<Task>) = copy(tasks = this.tasks + tasks)
 
 fun TodoState.removeTask(task: Task) = copy(tasks = tasks.filterNot { it == task })

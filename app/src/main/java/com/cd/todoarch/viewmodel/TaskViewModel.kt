@@ -13,6 +13,7 @@ import com.cd.todoarch.core.todoapp.event.TodoEvent.TaskRemoved
 import com.cd.todoarch.core.todoapp.event.TodoEvent.TaskUpdated
 import com.cd.todoarch.core.todoapp.model.Task
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -22,6 +23,8 @@ class TaskViewModel : ViewModel() {
     private val todoCommandCenter by inject<TodoCommandCenter>()
 
     val tasks: Flow<List<Task>> = todoCommandCenter.state.map { it.tasks }
+
+    val loading: Flow<Boolean> = todoCommandCenter.state.map { it.loadingTasks }.distinctUntilChanged()
     val tasksChangedEvents: Flow<TodoEvent> = todoCommandCenter.events.filter {
         it is TaskRemoved || it is TaskUpdated
     }
