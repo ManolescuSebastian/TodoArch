@@ -3,15 +3,15 @@ package com.cd.todoarch.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cd.todoarch.core.framework.inject
-import com.cd.todoarch.core.todoapp.TodoCommand
-import com.cd.todoarch.core.todoapp.TodoCommandCenter
-import com.cd.todoarch.core.todoapp.command.AddTask
-import com.cd.todoarch.core.todoapp.command.RemoveTask
-import com.cd.todoarch.core.todoapp.command.UpdateTask
+import com.cd.todoarch.core.todoapp.TodoKommand
+import com.cd.todoarch.core.todoapp.TodoFlux
+import com.cd.todoarch.core.todoapp.kommand.AddTask
+import com.cd.todoarch.core.todoapp.kommand.RemoveTask
+import com.cd.todoarch.core.todoapp.kommand.UpdateTask
 import com.cd.todoarch.core.todoapp.event.TodoEvent
 import com.cd.todoarch.core.todoapp.event.TodoEvent.TaskRemoved
 import com.cd.todoarch.core.todoapp.event.TodoEvent.TaskUpdated
-import com.cd.todoarch.core.todoapp.model.Task
+import com.cd.todoarch.core.todoapp.state.model.Task
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 
 class TaskViewModel : ViewModel() {
 
-    private val todoCommandCenter by inject<TodoCommandCenter>()
+    private val todoCommandCenter by inject<TodoFlux>()
 
     val tasks: Flow<List<Task>> = todoCommandCenter.state.map { it.tasks }
 
@@ -41,7 +41,7 @@ class TaskViewModel : ViewModel() {
         executeCommand(UpdateTask(taskId, title, description))
     }
 
-    private fun executeCommand(command: TodoCommand) {
+    private fun executeCommand(command: TodoKommand) {
         viewModelScope.launch {
             todoCommandCenter.execute(command)
         }

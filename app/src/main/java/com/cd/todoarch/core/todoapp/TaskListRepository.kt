@@ -1,6 +1,6 @@
 package com.cd.todoarch.core.todoapp
 
-import com.cd.todoarch.core.todoapp.model.Task
+import com.cd.todoarch.core.todoapp.state.model.Task
 
 interface TaskListRepository {
     suspend fun loadTasks(): List<Task>

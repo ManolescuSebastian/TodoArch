@@ -1,7 +1,7 @@
 package com.cd.todoarch.core.todoapp.io
 
 import com.cd.todoarch.core.todoapp.TaskListRepository
-import com.cd.todoarch.core.todoapp.model.Task
+import com.cd.todoarch.core.todoapp.state.model.Task
 import kotlinx.coroutines.delay
 
 class FakeTaskListRepository : TaskListRepository {

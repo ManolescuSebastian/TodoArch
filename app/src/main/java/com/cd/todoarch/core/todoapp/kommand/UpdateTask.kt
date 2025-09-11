@@ -1,19 +1,16 @@
-package com.cd.todoarch.core.todoapp.command
+package com.cd.todoarch.core.todoapp.kommand
 
-import com.cd.todoarch.core.todoapp.TodoCommand
-import com.cd.todoarch.core.todoapp.event.TodoEvent
+import com.cd.todoarch.core.todoapp.TodoKommand
 import com.cd.todoarch.core.todoapp.event.TodoEvent.TaskUpdated
-import com.cd.todoarch.core.todoapp.model.Task
-import com.cd.todoarch.core.todoapp.state.addTasks
 import com.cd.todoarch.core.todoapp.state.updateTask
 
 class UpdateTask(
     private val taskId: Int,
     private val title: String,
     private val description: String,
-) : TodoCommand() {
-    override suspend fun buildCommand() {
-        stateChange {
+) : TodoKommand() {
+    override suspend fun describe() {
+        mutation {
             updateTask(
                 taskId = taskId,
                 title = title,
@@ -21,6 +18,6 @@ class UpdateTask(
             )
         }
         event(TaskUpdated(taskId))
-        subCommand(SaveTaskList)
+        composeWith(SaveTaskList)
     }
 }

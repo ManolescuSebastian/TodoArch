@@ -1,9 +1,9 @@
 package com.cd.todoarch.core.todoapp
 
-import com.cd.todoarch.core.framework.Command
-import com.cd.todoarch.core.framework.CommandCenter
+import com.cd.todoarch.core.framework.Kommand
+import com.cd.todoarch.core.framework.FluxKore
 import com.cd.todoarch.core.todoapp.event.TodoEvent
 import com.cd.todoarch.core.todoapp.state.TodoState
 
-typealias TodoCommandCenter = CommandCenter<TodoState, TodoEvent>
-typealias TodoCommand = Command<TodoState, TodoEvent>
+typealias TodoFlux = FluxKore<TodoState, TodoEvent>
+typealias TodoKommand = Kommand<TodoState, TodoEvent>
