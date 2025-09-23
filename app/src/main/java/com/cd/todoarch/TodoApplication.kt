@@ -14,15 +14,15 @@ import kotlinx.coroutines.launch
 class TodoApplication : Application() {
 
     private val applicationScope = MainScope()
-    private val todoCommandCenter = TodoFlux(initialState = TodoState())
+    private val todoFlux = TodoFlux(initialState = TodoState())
     override fun onCreate() {
         super.onCreate()
         // init bindings
-        factory<TodoFlux> { todoCommandCenter  }
+        factory<TodoFlux> { todoFlux  }
         single<TaskListRepository> { FakeTaskListRepository() }
 
         applicationScope.launch {
-            todoCommandCenter.execute(LoadTasks)
+            todoFlux.execute(LoadTasks)
         }
     }
 }

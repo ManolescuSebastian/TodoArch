@@ -1,4 +1,4 @@
-package com.cd.todoarch.viewmodel
+package com.cd.todoarch.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

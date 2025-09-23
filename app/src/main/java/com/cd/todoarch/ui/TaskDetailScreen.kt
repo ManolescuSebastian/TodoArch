@@ -1,4 +1,4 @@
-package com.cd.todoarch
+package com.cd.todoarch.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.cd.todoarch.viewmodel.TaskViewModel
+import com.cd.todoarch.ui.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

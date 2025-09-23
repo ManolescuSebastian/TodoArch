@@ -1,4 +1,4 @@
-package com.cd.todoarch
+package com.cd.todoarch.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -52,7 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cd.todoarch.core.todoapp.state.model.Task
 import com.cd.todoarch.ui.theme.TodoArchTheme
-import com.cd.todoarch.viewmodel.TaskViewModel
+import com.cd.todoarch.ui.viewmodel.TaskViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
