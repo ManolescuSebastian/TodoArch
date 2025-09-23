@@ -24,9 +24,13 @@ class TaskViewModel : ViewModel() {
 
     val tasks: Flow<List<Task>> = todoFlux.state.map { it.tasks }
 
-    val loading: Flow<Boolean> = todoFlux.state.map { it.loadingTasks }.distinctUntilChanged()
+    val loading: Flow<Boolean> = todoFlux
+        .state
+        .map { it.loadingTasks }
+        .distinctUntilChanged()
+
     val tasksChangedEvents: Flow<TodoEvent> = todoFlux.events.filter {
-        it is TaskRemoved || it is TaskUpdated
+        listOf(TaskRemoved::class, TaskUpdated::class).contains(it::class)
     }
 
     fun addTask(title: String, description: String) {
