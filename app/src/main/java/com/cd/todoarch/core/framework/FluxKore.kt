@@ -1,5 +1,9 @@
 package com.cd.todoarch.core.framework
 
+import com.cd.todoarch.core.framework.FluxStep.Action
+import com.cd.todoarch.core.framework.FluxStep.Event
+import com.cd.todoarch.core.framework.FluxStep.Mutation
+import com.cd.todoarch.core.framework.FluxStep.SubKommand
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -7,10 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
-import com.cd.todoarch.core.framework.FluxStep.Action
-import com.cd.todoarch.core.framework.FluxStep.Event
-import com.cd.todoarch.core.framework.FluxStep.Mutation
-import com.cd.todoarch.core.framework.FluxStep.SubKommand
 
 class FluxKore<STATE, EVENT>(initialState: STATE) {
     private val _events = MutableSharedFlow<EVENT>()
@@ -20,13 +20,11 @@ class FluxKore<STATE, EVENT>(initialState: STATE) {
 
     suspend fun execute(kommand: Kommand<STATE, EVENT>) {
         kommand.steps().collect {
-            runCatching { // Kommand should never crash the app
-                when (it) {
-                    is Mutation -> _state.value = it.mutator(state.value)
-                    is Event -> _events.emit(it.event)
-                    is SubKommand -> execute(it.kommand)
-                    is Action -> it.action(_state.value)
-                }
+            when (it) {
+                is Mutation -> _state.value = it.mutator(state.value)
+                is Event -> _events.emit(it.event)
+                is SubKommand -> execute(it.kommand)
+                is Action -> it.action(_state.value)
             }
         }
     }
